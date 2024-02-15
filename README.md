@@ -30,3 +30,5 @@
 [5] <https://csguide.tech/s/articles/horners_method_of_hash_calculation>
 
 [6] <https://www.cs.umd.edu/class/fall2019/cmsc420-0201/Lects/lect10-hash-basics.pdf>
+
+[7] [Learning Rust With Entirely Too Many Linked Lists](https://rust-unofficial.github.io/too-many-lists/index.html#learn-rust-with-entirely-too-many-linked-lists)
