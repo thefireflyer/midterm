@@ -1,26 +1,15 @@
-use std::{
-    io::{stdin, stdout, IsTerminal, Read},
-    path::PathBuf,
-    process::Command,
-};
+use std::{fs, path::PathBuf, process::Command};
 
-use anyhow::Result;
+use anyhow::{Error, Result};
 use clap::Parser;
-use cursive::backends::crossterm::crossterm::{
-    execute,
-    style::{Color, Print, ResetColor, SetBackgroundColor, SetForegroundColor},
-    terminal::{Clear, ClearType},
-};
 use spell_checker::SpellChecker;
-
-use crate::interactive::start_interactive;
+use std::process::Stdio;
 
 ///////////////////////////////////////////////////////////////////////////////
 
 mod cli;
-mod interactive;
 
-//cargo run -- --path '/usr/share/myspell/dicts/en_US-large.dic
+//cargo run -- -p '/usr/share/myspell/dicts/en_US-large.dic' check-suggest
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -31,23 +20,49 @@ fn main() -> Result<()> {
 
     let mut spell_checker = SpellChecker::from_file(&source)?;
 
-    println!();
-    println!("{:-^80}", "");
-    println!();
-
-    if stdin().is_terminal() {
-        start_interactive(spell_checker)
-    } else {
-        Ok(())
+    match args.command {
+        cli::Command::Check { text } => {
+            for word in text {
+                if !spell_checker.check(&word) {
+                    println!("{}", word);
+                }
+            }
+        }
+        cli::Command::Suggest { word, limit } => {
+            if !spell_checker.check(&word) {
+                for suggestion in spell_checker.suggest(&word).iter().take(limit) {
+                    println!("{}", suggestion);
+                }
+                println!();
+            }
+        }
+        cli::Command::CheckSuggest { text, limit } => {
+            for word in text {
+                if !spell_checker.check(&word) {
+                    println!("~~~ {}", word);
+                    for suggestion in spell_checker.suggest(&word).iter().take(limit) {
+                        println!("    {}", suggestion);
+                    }
+                    println!();
+                }
+            }
+        }
+        cli::Command::Add { word } => {
+            if !spell_checker.check(&word) {
+                spell_checker.add_word(&word);
+                fs::write("/tmp/tmp.dic", spell_checker.to_string())?;
+            }
+        }
+        cli::Command::Interactive => todo!(),
     }
+
+    Ok(())
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
 #[cfg(target_os = "linux")]
 fn find_default() -> Result<PathBuf> {
-    use std::{fs, process::Stdio};
-
     println!("No dictionary provided, searching default paths...");
 
     let output = Command::new("fd")
@@ -79,6 +94,11 @@ fn find_default() -> Result<PathBuf> {
                 Ok(contents) => {
                     if contents.contains("probably") {
                         println!("Using {}", path.clone());
+
+                        println!();
+                        println!("{:-^80}", "");
+                        println!();
+
                         return Ok(PathBuf::from(path));
                     }
                 }
@@ -87,7 +107,7 @@ fn find_default() -> Result<PathBuf> {
         }
     }
 
-    Ok(PathBuf::new())
+    Err(Error::msg("Unable to find default"))
 }
 
 ///////////////////////////////////////////////////////////////////////////////

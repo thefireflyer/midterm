@@ -37,18 +37,19 @@ where
 fn levenshtein_distance(first: &str, second: &str) -> usize {
     // iterative single row based on [] and []
 
+    let first: Vec<char> = first.chars().collect();
+    let second: Vec<char> = second.chars().collect();
+
     let mut row: Vec<usize> = (0..second.len() + 1).into_iter().collect();
 
     let mut previous_diagonal;
     let mut previous_above = 0;
 
-    println!("{:#?}", row);
-
     for i in 0..first.len() {
         row[0] = i + 1;
 
         for j in 0..second.len() {
-            let indicator = t(first[i..i + 1] != second[j..j + 1], 1, 0);
+            let indicator = t(first[i] != second[j], 1, 0);
             previous_diagonal = previous_above;
             previous_above = row[j + 1];
             row[j + 1] = min(
@@ -103,7 +104,7 @@ impl SpellChecker {
 
     /// Returns true if the word is in the dictionary, otherwise false
     pub fn check(&self, word: &str) -> bool {
-        self.dictionary.contains(word)
+        self.dictionary.contains(&word.to_lowercase())
     }
 
     /// Returns a sorted list of similar words
@@ -119,8 +120,6 @@ impl SpellChecker {
 
         let suggestions = suggestions.into_sorted_vec();
 
-        println!("{:#?}", suggestions);
-
         suggestions.iter().map(|c| c.word.to_owned()).collect()
     }
 
@@ -128,7 +127,7 @@ impl SpellChecker {
 
     /// Adds the given word to the dictionary
     pub fn add_word(&mut self, word: &str) {
-        self.dictionary.insert(word.to_owned());
+        self.dictionary.insert(word.to_lowercase());
     }
 
     /// Returns all known words
@@ -162,7 +161,7 @@ impl SpellChecker {
 
         for line in contents.lines() {
             let word = line.split("/").next().unwrap_or_default();
-            context.add_word(word);
+            context.add_word(&word.to_lowercase());
         }
 
         Ok(context)

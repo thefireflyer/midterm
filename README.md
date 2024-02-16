@@ -12,6 +12,7 @@
 ### Progress (delete me)
 
 - [ ] code library
+
     - [x] copy over algorithms
         - [x] linear search
         - [x] binary search
@@ -44,15 +45,26 @@
         - [ ] clean up single linked list
 
 - [ ] spell checker
+
     - [ ] library
         - [x] check
         - [x] edit distance
-        - [?] suggest
+        - [x] suggest
         - [x] load from file
+        - [x] add word
+        - [ ] switch to separate chaining hashset
+
     - [ ] cli
+        - [x] check
+        - [x] suggest
+        - [x] load from file
+        - [x] add word
+        - [ ] interactive mode?
+    
     - [ ] video
 
 - [ ] hanoi tower
+
     - [ ] solver
     - [ ] gui
     - [ ] video
