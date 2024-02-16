@@ -1,11 +1,8 @@
-use std::{
-    borrow::Borrow,
-    collections::{BinaryHeap, HashSet},
-    fs,
-    path::PathBuf,
-};
+use std::{borrow::Borrow, collections::BinaryHeap, fs, path::PathBuf};
 
 use anyhow::Result;
+
+use cs_240_library::data_structures::hashset::HashSet;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -96,7 +93,7 @@ impl SpellChecker {
     /// Returns a spell checker with no known words
     pub fn new() -> SpellChecker {
         SpellChecker {
-            dictionary: HashSet::new(),
+            dictionary: HashSet::new().with_capacity(50000),
         }
     }
 
@@ -104,14 +101,14 @@ impl SpellChecker {
 
     /// Returns true if the word is in the dictionary, otherwise false
     pub fn check(&self, word: &str) -> bool {
-        self.dictionary.contains(&word.to_lowercase())
+        self.dictionary.contains(word.to_lowercase())
     }
 
     /// Returns a sorted list of similar words
     pub fn suggest(&self, word: &str) -> Vec<String> {
         let mut suggestions = BinaryHeap::with_capacity(self.dictionary.len());
 
-        for other in &self.dictionary {
+        for other in &self.dictionary.items() {
             suggestions.push(RankedWord {
                 ranking: levenshtein_distance(word, &other),
                 word: other.to_string(),
@@ -131,12 +128,12 @@ impl SpellChecker {
     }
 
     /// Returns all known words
-    pub fn words(&self) -> Vec<&String> {
-        self.dictionary.borrow().into_iter().collect()
+    pub fn words(&self) -> Vec<String> {
+        self.dictionary.borrow().items()
     }
 
     /// Returns all known words in sorted order
-    pub fn sorted_words(&self) -> Vec<&String> {
+    pub fn sorted_words(&self) -> Vec<String> {
         let mut words = self.words();
         words.sort();
         words
@@ -192,7 +189,7 @@ mod tests {
         let mut spell_checker = SpellChecker::new();
 
         assert!(!spell_checker.check("test"));
-        assert_eq!(spell_checker.words(), Vec::<&String>::new());
+        assert_eq!(spell_checker.words(), Vec::<String>::new());
         assert_eq!(spell_checker.to_string(), "");
 
         spell_checker.add_word("a");

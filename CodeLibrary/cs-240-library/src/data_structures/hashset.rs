@@ -13,7 +13,7 @@ where
     Vec<u8>: From<T>,
 {
     inner: Vec<LinkedList<T>>,
-    size: usize,
+    len: usize,
     radix: usize,
 }
 
@@ -21,13 +21,13 @@ where
 
 impl<T> HashSet<T>
 where
-    T: Ord + fmt::Debug + Copy,
+    T: Ord + fmt::Debug + Clone,
     Vec<u8>: From<T>,
 {
     pub fn new() -> Self {
         Self {
             inner: vec![],
-            size: 0,
+            len: 0,
             radix: 29,
         }
     }
@@ -56,39 +56,39 @@ where
         let mut res = 0;
 
         for token in Vec::<u8>::from(val) {
-            res = res * self.radix + usize::from(token);
+            res = (res * self.radix + usize::from(token)) % self.inner.len();
         }
 
-        res % self.inner.len()
+        res
     }
 
     //.......................................................................//
 
-    pub fn add(&mut self, val: T) {
-        let hash = self.hash(val);
+    pub fn insert(&mut self, val: T) {
+        let hash = self.hash(val.clone());
 
         if let Some(_) = self.inner[hash].search(&val) {
         } else {
             self.inner[hash].push(val);
-            self.size += 1;
+            self.len += 1;
         }
     }
 
     //.......................................................................//
 
     pub fn remove(&mut self, val: T) {
-        let hash = self.hash(val);
+        let hash = self.hash(val.clone());
 
         if let Some(index) = self.inner[hash].search(&val) {
             self.inner[hash].delete(index);
-            self.size -= 1;
+            self.len -= 1;
         }
     }
 
     //.......................................................................//
 
     pub fn contains(&self, val: T) -> bool {
-        let hash = self.hash(val);
+        let hash = self.hash(val.clone());
 
         self.inner[hash].search(&val).is_some()
     }
@@ -96,17 +96,26 @@ where
     //.......................................................................//
 
     pub fn is_empty(&self) -> bool {
-        self.size == 0
+        self.len == 0
     }
 
     //.......................................................................//
 
-    pub fn size(&self) -> usize {
-        self.size
+    pub fn len(&self) -> usize {
+        self.len
     }
 
     pub fn capacity(&self) -> usize {
         self.inner.len()
+    }
+
+    //.......................................................................//
+
+    pub fn items(&self) -> Vec<T> {
+        self.inner
+            .iter()
+            .flat_map(|e| e.iter().map(|e| e.clone()))
+            .collect()
     }
 }
 
@@ -122,40 +131,40 @@ mod tests {
 
         assert!(table.is_empty());
 
-        table.add("a");
+        table.insert("a");
 
         assert!(!table.is_empty());
         assert!(table.contains("a"));
         assert!(!table.contains("b"));
         assert!(!table.contains("c"));
-        assert_eq!(table.size(), 1);
+        assert_eq!(table.len(), 1);
 
         table.remove("a");
 
         assert!(table.is_empty());
         assert!(!table.contains("a"));
-        assert_eq!(table.size(), 0);
+        assert_eq!(table.len(), 0);
 
-        table.add("a");
+        table.insert("a");
 
         assert!(!table.is_empty());
         assert!(table.contains("a"));
-        assert_eq!(table.size(), 1);
+        assert_eq!(table.len(), 1);
 
-        table.add("b");
+        table.insert("b");
 
         assert!(!table.is_empty());
         assert!(table.contains("a"));
         assert!(table.contains("b"));
-        assert_eq!(table.size(), 2);
+        assert_eq!(table.len(), 2);
 
-        table.add("c");
+        table.insert("c");
 
         assert!(!table.is_empty());
         assert!(table.contains("a"));
         assert!(table.contains("b"));
         assert!(table.contains("c"));
-        assert_eq!(table.size(), 3);
+        assert_eq!(table.len(), 3);
 
         table.remove("a");
 
@@ -163,7 +172,7 @@ mod tests {
         assert!(!table.contains("a"));
         assert!(table.contains("b"));
         assert!(table.contains("c"));
-        assert_eq!(table.size(), 2);
+        assert_eq!(table.len(), 2);
 
         table.remove("b");
 
@@ -171,15 +180,15 @@ mod tests {
         assert!(!table.contains("a"));
         assert!(!table.contains("b"));
         assert!(table.contains("c"));
-        assert_eq!(table.size(), 1);
+        assert_eq!(table.len(), 1);
 
-        table.add("c");
+        table.insert("c");
 
         assert!(!table.is_empty());
         assert!(!table.contains("a"));
         assert!(!table.contains("b"));
         assert!(table.contains("c"));
-        assert_eq!(table.size(), 1);
+        assert_eq!(table.len(), 1);
 
         table.remove("c");
 

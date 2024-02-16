@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 anyhow = "1.0.79"
 tailcall = "1.0.1"
+cs-240-library = { path = "../../CodeLibrary/cs-240-library/" }

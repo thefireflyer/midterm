@@ -37,8 +37,8 @@
         - [ ] unit testing
     
     - [ ] hash maps
-        - [ ] with probing
-        - [ ] with separate chaining
+        - [ ] with probing?
+        - [x] with separate chaining
 
     - [ ] clean up and review
         - [ ] clean up algorithms
