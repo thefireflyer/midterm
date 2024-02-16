@@ -9,6 +9,56 @@
 
 ---
 
+### Progress (delete me)
+
+- [ ] code library
+    - [x] copy over algorithms
+        - [x] linear search
+        - [x] binary search
+        - [x] selection sort
+        - [x] insertion sort
+        - [x] quick sort
+        - [x] merge sort
+
+    - [ ] linked lists
+        - [x] copy over single linked list
+        - [ ] double linked list
+            - [ ] unit testing
+
+    - [ ] stacks
+        - [ ] with array
+        - [ ] with linked list
+        - [ ] unit testing
+
+    - [ ] queues
+        - [ ] with array
+        - [ ] with linked list
+        - [ ] unit testing
+    
+    - [ ] hash maps
+        - [ ] with probing
+        - [ ] with separate chaining
+
+    - [ ] clean up and review
+        - [ ] clean up algorithms
+        - [ ] clean up single linked list
+
+- [ ] spell checker
+    - [ ] library
+        - [x] check
+        - [x] edit distance
+        - [?] suggest
+        - [x] load from file
+    - [ ] cli
+    - [ ] video
+
+- [ ] hanoi tower
+    - [ ] solver
+    - [ ] gui
+    - [ ] video
+
+---
+
 ### [Hanoi's Tower](HanoiTower/README.md)
 
 ### [Spell checker](SpellChecker/README.md)
