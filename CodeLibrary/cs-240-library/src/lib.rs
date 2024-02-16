@@ -98,6 +98,8 @@ pub mod data_structures {
         #[cfg(test)]
         mod shared_test_cases;
     }
+
+    pub mod hashset;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

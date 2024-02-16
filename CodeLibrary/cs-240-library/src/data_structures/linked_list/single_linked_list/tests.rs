@@ -163,10 +163,10 @@ fn search() {
     list.push(2);
     list.push(1);
 
-    assert_eq!(list.search(3), Some(2));
-    assert_eq!(list.search(1), Some(0));
+    assert_eq!(list.search(&3), Some(2));
+    assert_eq!(list.search(&1), Some(0));
 
-    assert_eq!(list.search(8), None);
+    assert_eq!(list.search(&8), None);
 }
 
 #[test]

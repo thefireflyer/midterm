@@ -29,10 +29,10 @@ We're just creating a standard struct with a head parameter.
 
 We'll break the head type out into an alias for readiblity.
 */
-#[derive(Debug)]
+#[derive(PartialEq, PartialOrd, Debug)]
 pub struct LinkedList<T>
 where
-    T: Ord + std::fmt::Debug + Clone,
+    T: Ord + std::fmt::Debug,
 {
     head: Cursor<T>,
 }
@@ -77,7 +77,7 @@ This bit isn't very interesting, just regular node definition as in any langauge
 #[derive(PartialEq, Debug)]
 struct Node<T>
 where
-    T: Ord + std::fmt::Debug + Clone,
+    T: Ord + std::fmt::Debug,
 {
     data: T,
     next: Cursor<T>,
@@ -90,7 +90,7 @@ Let's define some methods! (these are denoted with &self or similar)
 */
 impl<T> LinkedList<T>
 where
-    T: Ord + std::fmt::Debug + Clone,
+    T: Ord + std::fmt::Debug,
 {
     pub fn new() -> Self {
         /*
@@ -293,14 +293,14 @@ where
 
     //-----------------------------------------------------------------------//
 
-    pub fn search(&self, value: T) -> Option<usize> {
+    pub fn search(&self, value: &T) -> Option<usize> {
         // just iterate until we find the target
         unsafe {
             let mut ind = 0;
             let mut cursor = self.head;
 
             while !cursor.is_null() {
-                if value == (*cursor).data {
+                if value == &(*cursor).data {
                     return Some(ind);
                 }
                 ind += 1;
@@ -407,7 +407,7 @@ where
 
 impl<T> Drop for LinkedList<T>
 where
-    T: Ord + std::fmt::Debug + Clone,
+    T: Ord + std::fmt::Debug,
 {
     fn drop(&mut self) {
         while self.pop().is_some() {}

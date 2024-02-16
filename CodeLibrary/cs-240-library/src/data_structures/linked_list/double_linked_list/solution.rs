@@ -12,10 +12,10 @@ use std::{marker::PhantomData, ptr::NonNull};
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#[derive(Debug)]
+#[derive(PartialEq, PartialOrd, Debug)]
 pub struct LinkedList<T>
 where
-    T: Ord + std::fmt::Debug + Clone,
+    T: Ord + std::fmt::Debug,
 {
     front: Cursor<T>,
     back: Cursor<T>,
@@ -33,7 +33,7 @@ type Cursor<T> = Option<NonNull<Node<T>>>;
 #[derive(PartialEq, Debug)]
 struct Node<T>
 where
-    T: Ord + std::fmt::Debug + Clone,
+    T: Ord + std::fmt::Debug,
 {
     data: T,
     front: Cursor<T>,
@@ -44,7 +44,7 @@ where
 
 impl<T> LinkedList<T>
 where
-    T: Ord + std::fmt::Debug + Clone,
+    T: Ord + std::fmt::Debug,
 {
     pub fn new() -> Self {
         Self {
@@ -240,7 +240,7 @@ where
 
 impl<T> Drop for LinkedList<T>
 where
-    T: Ord + std::fmt::Debug + Clone,
+    T: Ord + std::fmt::Debug,
 {
     fn drop(&mut self) {
         while self.pop_front().is_some() {}
@@ -251,7 +251,7 @@ where
 
 pub struct Iter<'a, T>
 where
-    T: Ord + std::fmt::Debug + Clone,
+    T: Ord + std::fmt::Debug,
 {
     front: Cursor<T>,
     back: Cursor<T>,
@@ -263,7 +263,7 @@ where
 
 impl<'a, T> Iterator for Iter<'a, T>
 where
-    T: Ord + std::fmt::Debug + Clone,
+    T: Ord + std::fmt::Debug,
 {
     type Item = &'a T;
 
@@ -288,7 +288,7 @@ where
 
 pub struct IterMut<'a, T>
 where
-    T: Ord + std::fmt::Debug + Clone,
+    T: Ord + std::fmt::Debug,
 {
     front: Cursor<T>,
     back: Cursor<T>,
