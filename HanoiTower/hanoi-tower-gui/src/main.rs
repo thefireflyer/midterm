@@ -1,6 +1,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 
+use bevy::{
+    app::{App, Startup, Update},
+    DefaultPlugins,
+};
 use hanoi_tower_solver::{debug, hanoi_simple_iter, hanoi_simple_rec};
+
+use crate::camera::pan_orbit_camera;
+
+///////////////////////////////////////////////////////////////////////////////
+
+mod camera;
+mod systems;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -18,6 +29,12 @@ fn main() {
     let mut a = vec![];
     let mut t = vec![];
     hanoi_simple_iter(&mut o, &mut a, &mut t);
+
+    App::new()
+        .add_plugins(DefaultPlugins)
+        .add_systems(Startup, systems::setup)
+        .add_systems(Update, pan_orbit_camera)
+        .run();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

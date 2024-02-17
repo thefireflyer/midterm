@@ -22,8 +22,13 @@ use bevy::{
     },
     text::TextStyle,
     transform::components::Transform,
-    ui::{node_bundles::TextBundle, PositionType, Val},
+    ui::{
+        node_bundles::{NodeBundle, TextBundle},
+        JustifyContent, PositionType, Style, UiRect, Val,
+    },
 };
+
+use crate::camera::PanOrbitCamera;
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -53,14 +58,25 @@ pub fn setup(
         ..default()
     });
 
+    // commands.spawn((
+    //     Camera3dBundle {
+    //         transform: Transform::from_xyz(5.0, 3.5, -5.0).looking_at(Vec3::ZERO, Vec3::Y),
+    //         ..default()
+    //     },
+    //     EnvironmentMapLight {
+    //         diffuse_map: asset_server.load("diffuse.ktx2"),
+    //         specular_map: asset_server.load("specular.ktx2"),
+    //     },
+    // ));
+
     commands.spawn((
         Camera3dBundle {
             transform: Transform::from_xyz(5.0, 3.5, -5.0).looking_at(Vec3::ZERO, Vec3::Y),
-            ..default()
+            ..Default::default()
         },
-        EnvironmentMapLight {
-            diffuse_map: asset_server.load("diffuse.ktx2"),
-            specular_map: asset_server.load("specular.ktx2"),
+        PanOrbitCamera {
+            radius: 5.0,
+            ..Default::default()
         },
     ));
 
@@ -192,6 +208,29 @@ pub fn setup(
                     // Add the Name component
                     satellite,
                 ));
+            });
+        });
+
+    commands
+        .spawn(NodeBundle {
+            style: Style {
+                width: Val::Percent(100.0),
+                height: Val::Percent(100.0),
+                justify_content: JustifyContent::SpaceBetween,
+                ..default()
+            },
+            ..default()
+        })
+        .with_children(|parent| {
+            // left vertical fill (border)
+            parent.spawn(NodeBundle {
+                style: Style {
+                    width: Val::Px(300.),
+                    border: UiRect::all(Val::Px(2.)),
+                    ..default()
+                },
+                background_color: Color::rgb(0.0, 0.0, 0.0).into(),
+                ..default()
             });
         });
 }
