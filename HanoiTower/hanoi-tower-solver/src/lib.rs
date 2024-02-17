@@ -1,7 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-
 pub fn debug(o: &mut Vec<u32>, a: &mut Vec<u32>, t: &mut Vec<u32>, d: u32) {
     print!("{} | ", d);
     for _ in 0..d {
@@ -40,7 +38,7 @@ pub fn check(o: &mut Vec<u32>, a: &mut Vec<u32>, t: &mut Vec<u32>, d: u32) {
     }
 }
 
-//---------------------------------------------------------------------------//
+///////////////////////////////////////////////////////////////////////////////
 
 pub fn hanoi_simple_rec(
     m: usize,
@@ -83,8 +81,85 @@ pub fn hanoi_simple_rec(
 //---------------------------------------------------------------------------//
 
 pub fn hanoi_simple_iter(o: &mut Vec<u32>, a: &mut Vec<u32>, t: &mut Vec<u32>) {
+    fn inner(a: &mut Vec<u32>, b: &mut Vec<u32>) {
+        let vala = a.last();
+        let valb = b.last();
+
+        match (vala, valb) {
+            (None, None) => {}
+            (None, Some(_)) => a.push(b.pop().unwrap()),
+            (Some(_), None) => b.push(a.pop().unwrap()),
+            (Some(vala), Some(valb)) => {
+                if vala < valb {
+                    b.push(a.pop().unwrap());
+                } else {
+                    a.push(b.pop().unwrap());
+                }
+            }
+        }
+    }
+
     while (!o.is_empty()) || (!a.is_empty()) {
-        println!("---\no: {:?}\na: {:?}\nt: {:?}\n\n", o, a, t);
+        println!("o: {:?} a: {:?} t: {:?}", o, a, t);
+
+        inner(o, a);
+        println!("o: {:?} a: {:?} t: {:?}", o, a, t);
+
+        inner(o, t);
+        println!("o: {:?} a: {:?} t: {:?}", o, a, t);
+
+        inner(a, t);
+        println!("o: {:?} a: {:?} t: {:?}", o, a, t);
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+/*
+--- Variables pegs and disks
+
+Pegs = {} of k length
+Disks = [] of n length
+
+If k >= n, then just lay out the disk across n pegs and then collect them for a total of 2n-1 actions
+
+Otherwise,
+
+
+
+*/
+
+pub fn hanoi_general_rec(m: usize, d: u32, pegs: &mut Vec<Vec<u32>>) {
+    assert!(pegs.len() >= 3);
+
+    if m == 0 {
+        return;
+    } else if m == 1 {
+        // todo: origin and target need to be variable
+        let val = pegs[0].pop().unwrap();
+        pegs.last_mut().unwrap().push(val);
+    } else if m == 2 {
+        let val = pegs[0].pop().unwrap();
+        pegs[1].push(val);
+
+        let val = pegs[0].pop().unwrap();
+        pegs.last_mut().unwrap().push(val);
+
+        let val = pegs[1].pop().unwrap();
+        pegs.last_mut().unwrap().push(val);
+    } else {
+        let val = pegs[0].last().unwrap().clone();
+
+        let (source, others) = pegs.split_at_mut(1);
+
+        // spread out
+        for peg in others
+            .iter_mut()
+            .filter(|peg| peg.last().is_some_and(|x| x < &val))
+        {
+            let val = source[0].pop().unwrap();
+            peg.push(val);
+        }
     }
 }
 
@@ -94,27 +169,6 @@ pub fn hanoi_simple_iter(o: &mut Vec<u32>, a: &mut Vec<u32>, t: &mut Vec<u32>) {
 mod tests {
     use super::*;
 
-    #[test]
-    fn test_hanoi_simple_rec_p() {
-        for i in 0..20 {
-            let f: Vec<u32> = (0..i + 1).rev().collect();
-            let mut o = (0..i).rev().collect();
-            let mut a = vec![];
-            let mut t = vec![i];
-            hanoi_simple_rec(
-                i.try_into().unwrap(),
-                &mut o,
-                &mut a,
-                &mut t,
-                0,
-                &|o, a, t, d| debug(o, a, t, d),
-            );
-            assert_eq!(o, vec![]);
-            assert_eq!(a, vec![]);
-            assert_eq!(t, f.clone());
-            println!();
-        }
-    }
     #[test]
     fn test_hanoi_simple_rec() {
         for i in 0..20 {
@@ -130,6 +184,21 @@ mod tests {
                 0,
                 &|o, a, t, d| debug(o, a, t, d),
             );
+            assert_eq!(o, vec![]);
+            assert_eq!(a, vec![]);
+            assert_eq!(t, f.clone());
+            println!();
+        }
+    }
+
+    #[test]
+    fn test_hanoi_simple_iter() {
+        for i in 0..20 {
+            let f: Vec<u32> = (0..i).rev().collect();
+            let mut o = f.clone();
+            let mut a = vec![];
+            let mut t = vec![];
+            hanoi_simple_iter(&mut o, &mut a, &mut t);
             assert_eq!(o, vec![]);
             assert_eq!(a, vec![]);
             assert_eq!(t, f.clone());
