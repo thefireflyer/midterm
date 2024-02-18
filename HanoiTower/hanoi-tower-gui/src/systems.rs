@@ -82,188 +82,267 @@ pub fn setup(mut commands: Commands) {
                 })
                 .with_children(|parent| {
                     parent
-                        .spawn((
-                            ButtonBundle {
-                                style: Style {
-                                    width: Val::Px(60.0),
-                                    height: Val::Px(60.0),
-                                    justify_content: JustifyContent::Center,
-                                    align_items: AlignItems::Center,
-                                    ..default()
-                                },
-                                background_color: bevy::prelude::BackgroundColor(Color::rgb(
-                                    0.1, 0.1, 0.1,
-                                )),
+                        .spawn(NodeBundle {
+                            style: Style {
+                                height: Val::Px(100.),
+                                align_self: bevy::ui::AlignSelf::End,
+                                justify_content: JustifyContent::SpaceEvenly,
+                                align_items: AlignItems::Center,
+                                display: Display::Grid,
+                                grid_auto_flow: GridAutoFlow::Column,
+                                column_gap: Val::Px(10.),
                                 ..default()
                             },
-                            Name::new(TOWER_INC),
-                        ))
+                            ..default()
+                        })
                         .with_children(|parent| {
-                            parent.spawn(TextBundle::from_section(
-                                "+",
-                                TextStyle {
-                                    // font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                    font: default(),
-                                    font_size: 50.0,
-                                    color: Color::rgb(0.9, 0.9, 0.9),
-                                },
+                            parent.spawn((
+                                TextBundle::from_section(
+                                    "3 towers",
+                                    TextStyle {
+                                        font: default(),
+                                        font_size: 30.0,
+                                        color: Color::rgb(0.9, 0.9, 0.9),
+                                    },
+                                ),
+                                Name::new(TOWER_DISPLAY),
                             ));
+                            parent
+                                .spawn((
+                                    ButtonBundle {
+                                        style: Style {
+                                            width: Val::Px(60.0),
+                                            height: Val::Px(60.0),
+                                            justify_content: JustifyContent::Center,
+                                            align_items: AlignItems::Center,
+                                            ..default()
+                                        },
+                                        background_color: bevy::prelude::BackgroundColor(
+                                            Color::rgb(0.1, 0.1, 0.1),
+                                        ),
+                                        ..default()
+                                    },
+                                    Name::new(TOWER_INC),
+                                ))
+                                .with_children(|parent| {
+                                    parent.spawn((
+                                        Name::new(""),
+                                        TextBundle::from_section(
+                                            "+",
+                                            TextStyle {
+                                                font: default(),
+                                                font_size: 50.0,
+                                                color: Color::rgb(0.9, 0.9, 0.9),
+                                            },
+                                        ),
+                                    ));
+                                });
+                            parent
+                                .spawn((
+                                    ButtonBundle {
+                                        style: Style {
+                                            width: Val::Px(60.0),
+                                            height: Val::Px(60.0),
+                                            justify_content: JustifyContent::Center,
+                                            align_items: AlignItems::Center,
+                                            ..default()
+                                        },
+                                        background_color: bevy::prelude::BackgroundColor(
+                                            Color::rgb(0.1, 0.1, 0.1),
+                                        ),
+                                        ..default()
+                                    },
+                                    Name::new(TOWER_DEC),
+                                ))
+                                .with_children(|parent| {
+                                    parent.spawn((
+                                        Name::new(""),
+                                        TextBundle::from_section(
+                                            "-",
+                                            TextStyle {
+                                                font: default(),
+                                                font_size: 50.0,
+                                                color: Color::rgb(0.9, 0.9, 0.9),
+                                            },
+                                        ),
+                                    ));
+                                });
                         });
+
                     parent
-                        .spawn((
-                            ButtonBundle {
-                                style: Style {
-                                    width: Val::Px(60.0),
-                                    height: Val::Px(60.0),
-                                    // border: UiRect::all(Val::Px(5.0)),
-                                    // horizontally center child text
-                                    justify_content: JustifyContent::Center,
-                                    // vertically center child text
-                                    align_items: AlignItems::Center,
-                                    ..default()
-                                },
-                                // border_color: BorderColor(Color::BLACK),
-                                background_color: bevy::prelude::BackgroundColor(Color::rgb(
-                                    0.1, 0.1, 0.1,
-                                )),
+                        .spawn(NodeBundle {
+                            style: Style {
+                                height: Val::Px(100.),
+                                align_self: bevy::ui::AlignSelf::End,
+                                justify_content: JustifyContent::SpaceEvenly,
+                                align_items: AlignItems::Center,
+                                display: Display::Grid,
+                                grid_auto_flow: GridAutoFlow::Column,
+                                column_gap: Val::Px(10.),
                                 ..default()
                             },
-                            Name::new(TOWER_DEC),
-                        ))
+                            ..default()
+                        })
                         .with_children(|parent| {
-                            parent.spawn(TextBundle::from_section(
-                                "-",
-                                TextStyle {
-                                    // font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                    font: default(),
-                                    font_size: 50.0,
-                                    color: Color::rgb(0.9, 0.9, 0.9),
-                                },
+                            parent.spawn((
+                                TextBundle::from_section(
+                                    "3 disks",
+                                    TextStyle {
+                                        font: default(),
+                                        font_size: 30.0,
+                                        color: Color::rgb(0.9, 0.9, 0.9),
+                                    },
+                                ),
+                                Name::new(DISK_DISPLAY),
                             ));
+                            parent
+                                .spawn((
+                                    ButtonBundle {
+                                        style: Style {
+                                            width: Val::Px(60.0),
+                                            height: Val::Px(60.0),
+                                            justify_content: JustifyContent::Center,
+                                            align_items: AlignItems::Center,
+                                            ..default()
+                                        },
+                                        background_color: bevy::prelude::BackgroundColor(
+                                            Color::rgb(0.1, 0.1, 0.1),
+                                        ),
+                                        ..default()
+                                    },
+                                    Name::new(DISK_INC),
+                                ))
+                                .with_children(|parent| {
+                                    parent.spawn((
+                                        Name::new(""),
+                                        TextBundle::from_section(
+                                            "+",
+                                            TextStyle {
+                                                font: default(),
+                                                font_size: 50.0,
+                                                color: Color::rgb(0.9, 0.9, 0.9),
+                                            },
+                                        ),
+                                    ));
+                                });
+                            parent
+                                .spawn((
+                                    ButtonBundle {
+                                        style: Style {
+                                            width: Val::Px(60.0),
+                                            height: Val::Px(60.0),
+                                            justify_content: JustifyContent::Center,
+                                            align_items: AlignItems::Center,
+                                            ..default()
+                                        },
+                                        background_color: bevy::prelude::BackgroundColor(
+                                            Color::rgb(0.1, 0.1, 0.1),
+                                        ),
+                                        ..default()
+                                    },
+                                    Name::new(DISK_DEC),
+                                ))
+                                .with_children(|parent| {
+                                    parent.spawn((
+                                        Name::new(""),
+                                        TextBundle::from_section(
+                                            "-",
+                                            TextStyle {
+                                                font: default(),
+                                                font_size: 50.0,
+                                                color: Color::rgb(0.9, 0.9, 0.9),
+                                            },
+                                        ),
+                                    ));
+                                });
                         });
+
                     parent
-                        .spawn((
-                            ButtonBundle {
-                                style: Style {
-                                    width: Val::Px(60.0),
-                                    height: Val::Px(60.0),
-                                    // border: UiRect::all(Val::Px(5.0)),
-                                    // horizontally center child text
-                                    justify_content: JustifyContent::Center,
-                                    // vertically center child text
-                                    align_items: AlignItems::Center,
-                                    ..default()
-                                },
-                                // border_color: BorderColor(Color::BLACK),
-                                background_color: bevy::prelude::BackgroundColor(Color::rgb(
-                                    0.1, 0.1, 0.1,
-                                )),
+                        .spawn(NodeBundle {
+                            style: Style {
+                                height: Val::Px(100.),
+                                align_self: bevy::ui::AlignSelf::End,
+                                justify_content: JustifyContent::SpaceEvenly,
+                                align_items: AlignItems::Center,
+                                display: Display::Grid,
+                                grid_auto_flow: GridAutoFlow::Column,
+                                column_gap: Val::Px(10.),
                                 ..default()
                             },
-                            Name::new(DISK_INC),
-                        ))
+                            ..default()
+                        })
                         .with_children(|parent| {
-                            parent.spawn(TextBundle::from_section(
-                                "+",
-                                TextStyle {
-                                    // font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                    font: default(),
-                                    font_size: 50.0,
-                                    color: Color::rgb(0.9, 0.9, 0.9),
-                                },
+                            parent.spawn((
+                                TextBundle::from_section(
+                                    "2.0s",
+                                    TextStyle {
+                                        font: default(),
+                                        font_size: 30.0,
+                                        color: Color::rgb(0.9, 0.9, 0.9),
+                                    },
+                                ),
+                                Name::new(SPEED_DISPLAY),
                             ));
-                        });
-                    parent
-                        .spawn((
-                            ButtonBundle {
-                                style: Style {
-                                    width: Val::Px(60.0),
-                                    height: Val::Px(60.0),
-                                    // border: UiRect::all(Val::Px(5.0)),
-                                    // horizontally center child text
-                                    justify_content: JustifyContent::Center,
-                                    // vertically center child text
-                                    align_items: AlignItems::Center,
-                                    ..default()
-                                },
-                                // border_color: BorderColor(Color::BLACK),
-                                background_color: bevy::prelude::BackgroundColor(Color::rgb(
-                                    0.1, 0.1, 0.1,
-                                )),
-                                ..default()
-                            },
-                            Name::new(DISK_DEC),
-                        ))
-                        .with_children(|parent| {
-                            parent.spawn(TextBundle::from_section(
-                                "-",
-                                TextStyle {
-                                    // font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                    font: default(),
-                                    font_size: 50.0,
-                                    color: Color::rgb(0.9, 0.9, 0.9),
-                                },
-                            ));
-                        });
-                    parent
-                        .spawn((
-                            ButtonBundle {
-                                style: Style {
-                                    width: Val::Px(60.0),
-                                    height: Val::Px(60.0),
-                                    justify_content: JustifyContent::Center,
-                                    align_items: AlignItems::Center,
-                                    ..default()
-                                },
-                                background_color: bevy::prelude::BackgroundColor(Color::rgb(
-                                    0.1, 0.1, 0.1,
-                                )),
-                                ..default()
-                            },
-                            Name::new(SPEED_INC),
-                        ))
-                        .with_children(|parent| {
-                            parent.spawn(TextBundle::from_section(
-                                "+",
-                                TextStyle {
-                                    // font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                    font: default(),
-                                    font_size: 50.0,
-                                    color: Color::rgb(0.9, 0.9, 0.9),
-                                },
-                            ));
-                        });
-                    parent
-                        .spawn((
-                            ButtonBundle {
-                                style: Style {
-                                    width: Val::Px(60.0),
-                                    height: Val::Px(60.0),
-                                    // border: UiRect::all(Val::Px(5.0)),
-                                    // horizontally center child text
-                                    justify_content: JustifyContent::Center,
-                                    // vertically center child text
-                                    align_items: AlignItems::Center,
-                                    ..default()
-                                },
-                                // border_color: BorderColor(Color::BLACK),
-                                background_color: bevy::prelude::BackgroundColor(Color::rgb(
-                                    0.1, 0.1, 0.1,
-                                )),
-                                ..default()
-                            },
-                            Name::new(SPEED_DEC),
-                        ))
-                        .with_children(|parent| {
-                            parent.spawn(TextBundle::from_section(
-                                "-",
-                                TextStyle {
-                                    // font: asset_server.load("fonts/FiraSans-Bold.ttf"),
-                                    font: default(),
-                                    font_size: 50.0,
-                                    color: Color::rgb(0.9, 0.9, 0.9),
-                                },
-                            ));
+                            parent
+                                .spawn((
+                                    ButtonBundle {
+                                        style: Style {
+                                            width: Val::Px(60.0),
+                                            height: Val::Px(60.0),
+                                            justify_content: JustifyContent::Center,
+                                            align_items: AlignItems::Center,
+                                            ..default()
+                                        },
+                                        background_color: bevy::prelude::BackgroundColor(
+                                            Color::rgb(0.1, 0.1, 0.1),
+                                        ),
+                                        ..default()
+                                    },
+                                    Name::new(SPEED_INC),
+                                ))
+                                .with_children(|parent| {
+                                    parent.spawn((
+                                        Name::new(""),
+                                        TextBundle::from_section(
+                                            "+",
+                                            TextStyle {
+                                                font: default(),
+                                                font_size: 50.0,
+                                                color: Color::rgb(0.9, 0.9, 0.9),
+                                            },
+                                        ),
+                                    ));
+                                });
+                            parent
+                                .spawn((
+                                    ButtonBundle {
+                                        style: Style {
+                                            width: Val::Px(60.0),
+                                            height: Val::Px(60.0),
+                                            justify_content: JustifyContent::Center,
+                                            align_items: AlignItems::Center,
+                                            ..default()
+                                        },
+                                        background_color: bevy::prelude::BackgroundColor(
+                                            Color::rgb(0.1, 0.1, 0.1),
+                                        ),
+                                        ..default()
+                                    },
+                                    Name::new(SPEED_DEC),
+                                ))
+                                .with_children(|parent| {
+                                    parent.spawn((
+                                        Name::new(""),
+                                        TextBundle::from_section(
+                                            "-",
+                                            TextStyle {
+                                                font: default(),
+                                                font_size: 50.0,
+                                                color: Color::rgb(0.9, 0.9, 0.9),
+                                            },
+                                        ),
+                                    ));
+                                });
                         });
                     parent
                         .spawn((
@@ -283,14 +362,17 @@ pub fn setup(mut commands: Commands) {
                             Name::new(START_STOP),
                         ))
                         .with_children(|parent| {
-                            parent.spawn((TextBundle::from_section(
-                                "start",
-                                TextStyle {
-                                    font: default(),
-                                    font_size: 30.0,
-                                    color: Color::rgb(0.9, 0.9, 0.9),
-                                },
-                            ),));
+                            parent.spawn((
+                                Name::new(""),
+                                TextBundle::from_section(
+                                    "start",
+                                    TextStyle {
+                                        font: default(),
+                                        font_size: 30.0,
+                                        color: Color::rgb(0.9, 0.9, 0.9),
+                                    },
+                                ),
+                            ));
                         });
                 });
         });
@@ -300,15 +382,13 @@ pub fn setup(mut commands: Commands) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-
 pub fn button_system(
     mut interaction_query: Query<
         (&Interaction, &mut BackgroundColor, &Children, &Name),
         (Changed<Interaction>, With<Button>),
     >,
     mut commands: Commands,
-    mut text_query: Query<&mut Text>,
+    mut text_query: Query<(&mut Text, &Name)>,
     mut tower_state: ResMut<TowerConfig>,
     mut tower_query: Query<(Entity, &Tower)>,
     mut disks_query: Query<(Entity, &Disks)>,
@@ -317,7 +397,7 @@ pub fn button_system(
     mut camera_query: Query<(&mut PanOrbitCamera, &mut Transform)>,
 ) {
     for (interaction, mut color, children, name) in &mut interaction_query {
-        let mut text = text_query.get_mut(children[0]).unwrap();
+        let (mut text, _) = text_query.get_mut(children[0]).unwrap();
 
         match *interaction {
             Interaction::Pressed => {
@@ -357,6 +437,7 @@ pub fn button_system(
                     tower_state
                         .timer
                         .set_duration(Duration::from_secs_f32(speed));
+                    helper3(&mut tower_state, &mut text_query);
                     return;
                 }
 
@@ -366,11 +447,13 @@ pub fn button_system(
                     tower_state
                         .timer
                         .set_duration(Duration::from_secs_f32(speed));
+                    helper3(&mut tower_state, &mut text_query);
                     return;
                 }
 
                 ///////////////////////////////////////////////////////////////
 
+                helper3(&mut tower_state, &mut text_query);
                 helper2(
                     &mut commands,
                     &mut tower_state,
@@ -382,21 +465,56 @@ pub fn button_system(
                 );
             }
             Interaction::Hovered => {
-                // text.sections[0].value = "Hover".to_string();
                 *color = Color::rgb(0.3, 0.3, 0.3).into();
-                // border_color.0 = Color::WHITE;
             }
             Interaction::None => {
-                // text.sections[0].value = "Button".to_string();
                 *color = Color::rgb(0.2, 0.2, 0.2).into();
-                // border_color.0 = Color::BLACK;
             }
         }
     }
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 
-pub fn helper2(
+fn helper3(
+    mut tower_state: &mut ResMut<TowerConfig>,
+    mut text_query: &mut Query<(&mut Text, &Name)>,
+) {
+    for (mut text, name) in text_query {
+        if name == &Name::new(TOWER_DISPLAY) {
+            text.sections[0] = TextSection::new(
+                tower_state.number_of_towers.to_string() + " towers",
+                TextStyle {
+                    font: default(),
+                    font_size: 30.0,
+                    color: Color::rgb(0.9, 0.9, 0.9),
+                },
+            );
+        }
+        if name == &Name::new(DISK_DISPLAY) {
+            text.sections[0] = TextSection::new(
+                tower_state.number_of_disks.to_string() + " disks",
+                TextStyle {
+                    font: default(),
+                    font_size: 30.0,
+                    color: Color::rgb(0.9, 0.9, 0.9),
+                },
+            );
+        }
+        if name == &Name::new(SPEED_DISPLAY) {
+            text.sections[0] = TextSection::new(
+                tower_state.speed.to_string() + "s",
+                TextStyle {
+                    font: default(),
+                    font_size: 30.0,
+                    color: Color::rgb(0.9, 0.9, 0.9),
+                },
+            );
+        }
+    }
+}
+
+fn helper2(
     mut commands: &mut Commands,
     mut tower_state: &mut ResMut<TowerConfig>,
     tower_query: &mut Query<(Entity, &Tower)>,
@@ -486,16 +604,6 @@ pub fn helper2(
         (f32::from(tower_state.number_of_disks - 1) * 0.6) * 0.5,
         0.0,
     );
-
-    // camera_query.iter_mut().next().unwrap().1.set(Box::new(
-    //     Transform::from_xyz(
-    //         center.x,
-    //         (f32::from(tower_state.number_of_disks - 1) * 0.6),
-    //         -(f32::from(tower_state.number_of_towers - 1) * 3.0)
-    //             - (f32::from(tower_state.number_of_disks) * 1.0),
-    //     )
-    //     .looking_at(center, Vec3::Y),
-    // ));
 
     let (mut cam, mut transform) = camera_query.iter_mut().next().unwrap();
     cam.focus = center;
@@ -646,23 +754,5 @@ pub fn update_disk(
         println!("next");
 
         let (from, to, disk) = tower_state.moves.remove(0);
-
-        // let (entity, disk_ob, _, mut transform) = disk_query
-        //     .iter_mut()
-        //     .filter(|e| e.2 == &Name::new("disk".to_owned() + &disk.to_string()))
-        //     .next()
-        //     .unwrap();
-
-        // println!("moving {} from {} to {}", disk, from, to);
-        // println!("entity: {:?}, transform: {:?}", entity, transform);
-
-        // transform.set(Box::new(Transform::from_translation(Vec3 {
-        //     x: f32::from(u16::try_from(to).unwrap()) * 3.0,
-        //     y: f32::from(tower_state.number_of_disks - u16::try_from(disk).unwrap() - 1) * 0.6,
-        //     z: 0.0,
-        // })));
-
-        // println!("entity: {:?}, transform: {:?}", entity, transform);
-        // println!();
     }
 }
