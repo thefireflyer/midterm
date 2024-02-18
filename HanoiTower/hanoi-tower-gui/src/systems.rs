@@ -481,6 +481,7 @@ pub fn button_system(
 ///////////////////////////////////////////////////////////////////////////////
 
 fn lerp(v0: f32, v1: f32, t: f32) -> f32 {
+    let t = f32::min(f32::max(t, 0.0), f32::MAX);
     (1.0 - t) * v0 + t * v1
 }
 
@@ -507,6 +508,24 @@ fn helper(i: usize, j: u32) -> Vec<(usize, usize, u32)> {
     println!("{:?}", moves);
     println!();
     moves
+}
+///////////////////////////////////////////////////////////////////////////////
+
+fn cubic_interp(v0: f32, v1: f32, t: f32) -> f32 {
+    // [source] https://www.youtube.com/watch?v=aVwxzDHniEw
+    let p0 = v0;
+    let p1 = lerp(v0, v1, 0.10);
+    let p2 = lerp(v0, v1, 0.90);
+    let p3 = v1;
+
+    let a = lerp(p0, p1, t);
+    let b = lerp(p1, p2, t);
+    let c = lerp(p2, p3, t);
+
+    let d = lerp(a, b, t);
+    let e = lerp(b, c, t);
+
+    lerp(d, e, t)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -550,22 +569,35 @@ pub fn update_disk(
             f32::from(tower_state.number_of_disks - u16::try_from(disk).unwrap() - 1) * 0.6;
         let tower_height = f32::from(tower_state.number_of_disks) * 0.6 + 0.45;
 
-        if progress <= 0.33333 {
+        let height_diff = tower_height - disk_height;
+        let tower_diff = f32::abs(to_x_pos - from_x_pos);
+
+        let total_diff = tower_diff + 2.0 * height_diff;
+
+        let height_time_frac = height_diff / total_diff;
+        let tower_time_frac = (height_diff + tower_diff) / total_diff;
+
+        println!(
+            "height frac {}, tower frac {}, total dist {}",
+            height_time_frac, tower_time_frac, total_diff
+        );
+
+        if progress <= height_time_frac {
             transform.set(Box::new(Transform::from_translation(Vec3 {
                 x: from_x_pos,
-                y: lerp(disk_height, tower_height, progress / 0.3),
+                y: cubic_interp(disk_height, tower_height, progress / height_time_frac),
                 z: 0.0,
             })));
-        } else if progress <= 0.6666 {
+        } else if progress <= tower_time_frac {
             transform.set(Box::new(Transform::from_translation(Vec3 {
-                x: lerp(from_x_pos, to_x_pos, progress / 0.6),
+                x: cubic_interp(from_x_pos, to_x_pos, progress / tower_time_frac),
                 y: tower_height,
                 z: 0.0,
             })));
         } else {
             transform.set(Box::new(Transform::from_translation(Vec3 {
                 x: to_x_pos,
-                y: lerp(tower_height, disk_height, progress / 1.0),
+                y: cubic_interp(tower_height, disk_height, progress / 1.0),
                 z: 0.0,
             })));
         }
