@@ -208,6 +208,7 @@ pub fn hanoi_general_rec(
             }
             let val = pegs[source].pop().unwrap();
             pegs[target].push(val);
+            moves.push((source, target, val));
             for i in (0..m - 1).rev() {
                 let val = pegs[aux[i]].pop().unwrap();
                 pegs[target].push(val);

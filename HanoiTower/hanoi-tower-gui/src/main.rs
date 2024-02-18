@@ -3,12 +3,17 @@
 use std::vec;
 
 use bevy::{
-    app::{App, Startup, Update},
+    app::{App, FixedUpdate, Startup, Update},
+    time::{Timer, TimerMode},
     DefaultPlugins,
 };
 use hanoi_tower_solver::{debug, hanoi_general_rec, hanoi_simple_iter, hanoi_simple_rec};
 
-use crate::{camera::pan_orbit_camera, resources::TowerConfig, systems::button_system};
+use crate::{
+    camera::pan_orbit_camera,
+    resources::TowerConfig,
+    systems::{button_system, update_disk},
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -40,12 +45,14 @@ fn main() {
             number_of_disks: 3,
             number_of_tower: 3,
             running: false,
-            speed: 1.0,
+            speed: 2.0,
             moves: vec![],
+            timer: Timer::from_seconds(2.0, TimerMode::Repeating),
         })
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, systems::setup)
         .add_systems(Update, (pan_orbit_camera, button_system))
+        .add_systems(FixedUpdate, update_disk)
         .run();
 }
 

@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
-use std::f32::consts::PI;
+use std::{f32::consts::PI, time::Duration};
 
 use bevy::prelude::*;
 use hanoi_tower_solver::hanoi_general_rec;
@@ -305,7 +305,7 @@ pub fn setup(
                 });
         });
 
-    commands.spawn((Disks, PbrBundle { ..default() }, AnimationPlayer::default()));
+    commands.spawn((Disks, PbrBundle { ..default() }));
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -321,7 +321,7 @@ pub fn button_system(
     mut text_query: Query<&mut Text>,
     mut tower_state: ResMut<TowerConfig>,
     tower_query: Query<(Entity, &Tower)>,
-    mut disks_query: Query<(Entity, &Disks, &mut AnimationPlayer)>,
+    mut disks_query: Query<(Entity, &Disks)>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut animations: ResMut<Assets<AnimationClip>>,
@@ -333,7 +333,7 @@ pub fn button_system(
             Interaction::Pressed => {
                 *color = Color::rgb(0.0, 0.0, 0.0).into();
 
-                let (entity, _, mut player) = disks_query.iter_mut().next().unwrap();
+                let (entity, _) = disks_query.iter_mut().next().unwrap();
 
                 ///////////////////////////////////////////////////////////////
 
@@ -341,11 +341,9 @@ pub fn button_system(
                     if text.sections[0].value == "start" {
                         text.sections[0].value = "stop".to_owned();
                         tower_state.running = true;
-                        player.resume();
                     } else if text.sections[0].value == "stop" {
                         text.sections[0].value = "start".to_owned();
                         tower_state.running = false;
-                        player.pause();
                     }
                 }
 
@@ -366,11 +364,21 @@ pub fn button_system(
                 }
 
                 if name.as_str() == SPEED_INC {
-                    tower_state.speed += 1.0;
+                    tower_state.speed += 0.5;
+                    let speed = tower_state.speed;
+                    tower_state
+                        .timer
+                        .set_duration(Duration::from_secs_f32(speed));
+                    return;
                 }
 
                 if name.as_str() == SPEED_DEC {
-                    tower_state.speed -= 1.0;
+                    tower_state.speed -= 0.5;
+                    let speed = tower_state.speed;
+                    tower_state
+                        .timer
+                        .set_duration(Duration::from_secs_f32(speed));
+                    return;
                 }
 
                 ///////////////////////////////////////////////////////////////
@@ -405,66 +413,10 @@ pub fn button_system(
 
                 commands.entity(entity).despawn_recursive();
 
-                // if tower_state.running {
-                tower_state.moves = helper(
-                    tower_state.number_of_tower.try_into().unwrap(),
-                    tower_state.number_of_disks.into(),
-                );
-
-                let mut animation = AnimationClip::default();
-
-                for (step, (from, to, disk)) in tower_state.moves.iter().enumerate() {
-                    let step = f32::from(u16::try_from(step).unwrap());
-                    let from = u16::try_from(from.clone()).unwrap();
-                    let to = u16::try_from(to.clone()).unwrap();
-                    println!("{:?}", Name::new("disk".to_string() + &disk.to_string()));
-
-                    animation.add_curve_to_path(
-                        EntityPath {
-                            parts: vec![Name::new("disk".to_string() + &disk.to_string())],
-                        },
-                        VariableCurve {
-                            keyframe_timestamps: (0..4 as i8)
-                                .map(|e| (f32::from(e) * 0.25 + step) * tower_state.speed)
-                                .collect(),
-                            keyframes: Keyframes::Translation(vec![
-                                Vec3::new(
-                                    f32::from(from) * 3.0,
-                                    f32::from(u16::try_from(disk.clone()).unwrap()) * 0.6,
-                                    0.0,
-                                ),
-                                Vec3::new(
-                                    f32::from(from) * 3.0,
-                                    f32::from(tower_state.number_of_disks) * 0.6,
-                                    0.0,
-                                ),
-                                Vec3::new(
-                                    f32::from(to) * 3.0,
-                                    f32::from(tower_state.number_of_disks) * 0.6,
-                                    0.0,
-                                ),
-                                Vec3::new(
-                                    f32::from(to) * 3.0,
-                                    f32::from(u16::try_from(disk.clone()).unwrap()) * 0.6,
-                                    0.0,
-                                ),
-                            ]),
-                            interpolation: Interpolation::CubicSpline,
-                        },
-                    );
-                }
-
-                println!("{:#?}", animation.curves());
-                println!("{:?}", animation.duration());
-                println!("{:?}", animation.compatible_with(&Name::new("disk0")));
-
                 println!();
 
-                let mut player = AnimationPlayer::default();
-                player.play(animations.add(animation));
-
                 commands
-                    .spawn((Disks, PbrBundle { ..default() }, player))
+                    .spawn((Disks, PbrBundle { ..default() }))
                     .with_children(|parent| {
                         for i in 0..tower_state.number_of_disks {
                             println!("{:?}", Name::new("disk".to_string() + &i.to_string()));
@@ -497,7 +449,7 @@ pub fn button_system(
                                     }),
                                     transform: Transform::from_translation(Vec3 {
                                         x: 0.0,
-                                        y: f32::from(i) * 0.6,
+                                        y: f32::from(tower_state.number_of_disks - i - 1) * 0.6,
                                         z: 0.0,
                                     }),
                                     ..default()
@@ -506,45 +458,12 @@ pub fn button_system(
                         }
                     });
 
-                //     commands.spawn((
-                //         Disk,
-                //         Name::new("disk".to_string() + &i.to_string()),
-                //         PbrBundle {
-                //             mesh: meshes.add(
-                //                 Torus {
-                //                     radius: 0.6,
-                //                     ring_radius: 0.3,
-                //                     ..default()
-                //                 }
-                //                 .into(),
-                //             ),
-                //             material: materials.add(StandardMaterial {
-                //                 base_color: Color::rgb(
-                //                     1.0,
-                //                     lerp(
-                //                         0.0,
-                //                         1.0,
-                //                         f32::from(i) / f32::from(tower_state.number_of_disks),
-                //                     ),
-                //                     lerp(
-                //                         0.0,
-                //                         1.0,
-                //                         f32::from(i) / f32::from(tower_state.number_of_disks),
-                //                     ),
-                //                 ),
-                //                 ..default()
-                //             }),
-                //             transform: Transform::from_translation(Vec3 {
-                //                 x: 0.0,
-                //                 y: f32::from(i) * 0.6,
-                //                 z: 0.0,
-                //             }),
-                //             ..default()
-                //         },
-                //     ));
-                // }
-
-                // border_color.0 = Color::RED;
+                if tower_state.running {
+                    tower_state.moves = helper(
+                        tower_state.number_of_tower.try_into().unwrap(),
+                        tower_state.number_of_disks.into(),
+                    );
+                }
             }
             Interaction::Hovered => {
                 // text.sections[0].value = "Hover".to_string();
@@ -591,3 +510,94 @@ fn helper(i: usize, j: u32) -> Vec<(usize, usize, u32)> {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+
+pub fn update_disk(
+    mut interaction_query: Query<
+        (&Interaction, &mut BackgroundColor, &Children, &Name),
+        (Changed<Interaction>, With<Button>),
+    >,
+    mut commands: Commands,
+    mut text_query: Query<&mut Text>,
+    mut tower_state: ResMut<TowerConfig>,
+    mut disk_query: Query<(Entity, &mut Disk, &Name, &mut Transform)>,
+    mut disks_query: Query<(Entity, &Disks)>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut animations: ResMut<Assets<AnimationClip>>,
+    time: Res<Time>,
+) {
+    if tower_state.running && !tower_state.moves.is_empty() {
+        println!("animating");
+
+        let (from, to, disk) = tower_state.moves[0];
+
+        let (entity, disk_ob, _, mut transform) = disk_query
+            .iter_mut()
+            .filter(|e| e.2 == &Name::new("disk".to_owned() + &disk.to_string()))
+            .next()
+            .unwrap();
+
+        println!("moving {} from {} to {}", disk, from, to);
+        println!("entity: {:?}, transform: {:?}", entity, transform);
+
+        let progress = tower_state.timer.fraction();
+
+        println!("{}% through step", progress);
+
+        let to_x_pos = f32::from(u16::try_from(to).unwrap()) * 3.0;
+        let from_x_pos = f32::from(u16::try_from(from).unwrap()) * 3.0;
+        let disk_height =
+            f32::from(tower_state.number_of_disks - u16::try_from(disk).unwrap() - 1) * 0.6;
+        let tower_height = f32::from(tower_state.number_of_disks) * 0.6 + 0.45;
+
+        if progress <= 0.33333 {
+            transform.set(Box::new(Transform::from_translation(Vec3 {
+                x: from_x_pos,
+                y: lerp(disk_height, tower_height, progress / 0.3),
+                z: 0.0,
+            })));
+        } else if progress <= 0.6666 {
+            transform.set(Box::new(Transform::from_translation(Vec3 {
+                x: lerp(from_x_pos, to_x_pos, progress / 0.6),
+                y: tower_height,
+                z: 0.0,
+            })));
+        } else {
+            transform.set(Box::new(Transform::from_translation(Vec3 {
+                x: to_x_pos,
+                y: lerp(tower_height, disk_height, progress / 1.0),
+                z: 0.0,
+            })));
+        }
+
+        println!("entity: {:?}, transform: {:?}", entity, transform);
+        println!();
+    }
+
+    if tower_state.timer.tick(time.delta()).just_finished()
+        && tower_state.running
+        && !tower_state.moves.is_empty()
+    {
+        println!("next");
+
+        let (from, to, disk) = tower_state.moves.remove(0);
+
+        // let (entity, disk_ob, _, mut transform) = disk_query
+        //     .iter_mut()
+        //     .filter(|e| e.2 == &Name::new("disk".to_owned() + &disk.to_string()))
+        //     .next()
+        //     .unwrap();
+
+        // println!("moving {} from {} to {}", disk, from, to);
+        // println!("entity: {:?}, transform: {:?}", entity, transform);
+
+        // transform.set(Box::new(Transform::from_translation(Vec3 {
+        //     x: f32::from(u16::try_from(to).unwrap()) * 3.0,
+        //     y: f32::from(tower_state.number_of_disks - u16::try_from(disk).unwrap() - 1) * 0.6,
+        //     z: 0.0,
+        // })));
+
+        // println!("entity: {:?}, transform: {:?}", entity, transform);
+        // println!();
+    }
+}
