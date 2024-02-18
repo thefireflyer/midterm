@@ -2,11 +2,16 @@
 
 use std::{f32::consts::PI, time::Duration};
 
-use bevy::prelude::*;
+use bevy::{
+    ecs::system::SystemId,
+    input::mouse::{MouseMotion, MouseWheel},
+    prelude::*,
+    window::PrimaryWindow,
+};
 use hanoi_tower_solver::hanoi_general_rec;
 
 use crate::{
-    camera::PanOrbitCamera,
+    camera::{pan_orbit_camera, PanOrbitCamera},
     components::{Disk, Disks, Tower},
     resources::TowerConfig,
 };
@@ -27,25 +32,10 @@ const START_STOP: &str = "StartStop";
 
 ///////////////////////////////////////////////////////////////////////////////
 
-pub fn setup(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    mut animations: ResMut<Assets<AnimationClip>>,
-    asset_server: Res<AssetServer>,
-) {
-    // commands.spawn(PbrBundle {
-    //     mesh: meshes.add(shape::Plane::from_size(10.0).into()),
-    //     material: materials.add(StandardMaterial {
-    //         base_color: Color::GRAY,
-    //         ..default()
-    //     }),
-    //     ..default()
-    // });
-
+pub fn setup(mut commands: Commands) {
     commands.spawn((
         Camera3dBundle {
-            transform: Transform::from_xyz(5.0, 3.5, -5.0).looking_at(Vec3::ZERO, Vec3::Y),
+            transform: Transform::from_xyz(0.0, 1.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
             ..Default::default()
         },
         PanOrbitCamera {
@@ -320,11 +310,11 @@ pub fn button_system(
     mut commands: Commands,
     mut text_query: Query<&mut Text>,
     mut tower_state: ResMut<TowerConfig>,
-    tower_query: Query<(Entity, &Tower)>,
+    mut tower_query: Query<(Entity, &Tower)>,
     mut disks_query: Query<(Entity, &Disks)>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut animations: ResMut<Assets<AnimationClip>>,
+    mut camera_query: Query<(&mut PanOrbitCamera, &mut Transform)>,
 ) {
     for (interaction, mut color, children, name) in &mut interaction_query {
         let mut text = text_query.get_mut(children[0]).unwrap();
@@ -332,8 +322,6 @@ pub fn button_system(
         match *interaction {
             Interaction::Pressed => {
                 *color = Color::rgb(0.0, 0.0, 0.0).into();
-
-                let (entity, _) = disks_query.iter_mut().next().unwrap();
 
                 ///////////////////////////////////////////////////////////////
 
@@ -348,18 +336,18 @@ pub fn button_system(
                 }
 
                 if name.as_str() == TOWER_INC {
-                    tower_state.number_of_tower += 1;
+                    tower_state.number_of_towers += 1;
                 }
 
-                if name.as_str() == TOWER_DEC {
-                    tower_state.number_of_tower -= 1;
+                if name.as_str() == TOWER_DEC && tower_state.number_of_towers > 3 {
+                    tower_state.number_of_towers -= 1;
                 }
 
                 if name.as_str() == DISK_INC {
                     tower_state.number_of_disks += 1;
                 }
 
-                if name.as_str() == DISK_DEC {
+                if name.as_str() == DISK_DEC && tower_state.number_of_disks > 1 {
                     tower_state.number_of_disks -= 1;
                 }
 
@@ -372,7 +360,7 @@ pub fn button_system(
                     return;
                 }
 
-                if name.as_str() == SPEED_DEC {
+                if name.as_str() == SPEED_DEC && tower_state.speed > 0.0 {
                     tower_state.speed -= 0.5;
                     let speed = tower_state.speed;
                     tower_state
@@ -383,87 +371,15 @@ pub fn button_system(
 
                 ///////////////////////////////////////////////////////////////
 
-                for (entity, _) in tower_query.iter() {
-                    commands.entity(entity).despawn();
-                }
-                for i in 0..tower_state.number_of_tower {
-                    commands.spawn((
-                        Tower,
-                        PbrBundle {
-                            mesh: meshes.add(bevy::math::primitives::Cylinder {
-                                radius: 0.3,
-                                half_height: f32::from(tower_state.number_of_disks) * 0.3,
-                                ..default()
-                            }),
-                            material: materials.add(StandardMaterial {
-                                base_color: Color::GRAY,
-                                ..default()
-                            }),
-                            transform: Transform::from_translation(Vec3 {
-                                x: f32::from(i) * 3.0,
-                                y: f32::from(tower_state.number_of_disks) * 0.6 * 0.5,
-                                z: 0.0,
-                            }),
-                            ..default()
-                        },
-                    ));
-                }
-
-                ///////////////////////////////////////////////////////////////
-
-                commands.entity(entity).despawn_recursive();
-
-                println!();
-
-                commands
-                    .spawn((Disks, PbrBundle { ..default() }))
-                    .with_children(|parent| {
-                        for i in 0..tower_state.number_of_disks {
-                            println!("{:?}", Name::new("disk".to_string() + &i.to_string()));
-                            parent.spawn((
-                                Disk,
-                                Name::new("disk".to_string() + &i.to_string()),
-                                PbrBundle {
-                                    mesh: meshes.add(bevy::math::primitives::Torus {
-                                        minor_radius: 0.3,
-                                        major_radius: 0.6,
-                                        ..default()
-                                    }),
-                                    material: materials.add(StandardMaterial {
-                                        base_color: Color::rgb(
-                                            1.0,
-                                            lerp(
-                                                0.0,
-                                                1.0,
-                                                f32::from(i)
-                                                    / f32::from(tower_state.number_of_disks),
-                                            ),
-                                            lerp(
-                                                0.0,
-                                                1.0,
-                                                f32::from(i)
-                                                    / f32::from(tower_state.number_of_disks),
-                                            ),
-                                        ),
-                                        ..default()
-                                    }),
-                                    transform: Transform::from_translation(Vec3 {
-                                        x: 0.0,
-                                        y: f32::from(tower_state.number_of_disks - i - 1) * 0.6,
-                                        z: 0.0,
-                                    }),
-                                    ..default()
-                                },
-                            ));
-                        }
-                    });
-
-                if tower_state.running {
-                    tower_state.moves = helper(
-                        tower_state.number_of_tower.try_into().unwrap(),
-                        tower_state.number_of_disks.into(),
-                    );
-                }
+                helper2(
+                    &mut commands,
+                    &mut tower_state,
+                    &mut tower_query,
+                    &mut disks_query,
+                    &mut meshes,
+                    &mut materials,
+                    &mut camera_query,
+                );
             }
             Interaction::Hovered => {
                 // text.sections[0].value = "Hover".to_string();
@@ -479,6 +395,123 @@ pub fn button_system(
     }
 }
 ///////////////////////////////////////////////////////////////////////////////
+
+pub fn helper2(
+    mut commands: &mut Commands,
+    mut tower_state: &mut ResMut<TowerConfig>,
+    tower_query: &mut Query<(Entity, &Tower)>,
+    mut disks_query: &mut Query<(Entity, &Disks)>,
+    mut meshes: &mut ResMut<Assets<Mesh>>,
+    mut materials: &mut ResMut<Assets<StandardMaterial>>,
+    mut camera_query: &mut Query<(&mut PanOrbitCamera, &mut Transform)>,
+) {
+    let (entity, _) = disks_query.iter_mut().next().unwrap();
+    for (entity, _) in tower_query.iter() {
+        commands.entity(entity).despawn();
+    }
+    for i in 0..tower_state.number_of_towers {
+        commands.spawn((
+            Tower,
+            PbrBundle {
+                mesh: meshes.add(bevy::math::primitives::Cylinder {
+                    radius: 0.3,
+                    half_height: f32::from(tower_state.number_of_disks) * 0.3,
+                    ..default()
+                }),
+                material: materials.add(StandardMaterial {
+                    base_color: Color::GRAY,
+                    ..default()
+                }),
+                transform: Transform::from_translation(Vec3 {
+                    x: f32::from(i) * 3.0,
+                    y: f32::from(tower_state.number_of_disks) * 0.6 * 0.5,
+                    z: 0.0,
+                }),
+                ..default()
+            },
+        ));
+    }
+
+    ///////////////////////////////////////////////////////////////
+
+    commands.entity(entity).despawn_recursive();
+
+    println!();
+
+    commands
+        .spawn((Disks, PbrBundle { ..default() }))
+        .with_children(|parent| {
+            for i in 0..tower_state.number_of_disks {
+                println!("{:?}", Name::new("disk".to_string() + &i.to_string()));
+                parent.spawn((
+                    Disk,
+                    Name::new("disk".to_string() + &i.to_string()),
+                    PbrBundle {
+                        mesh: meshes.add(bevy::math::primitives::Torus {
+                            minor_radius: 0.3,
+                            major_radius: 0.6,
+                            ..default()
+                        }),
+                        material: materials.add(StandardMaterial {
+                            base_color: Color::rgb(
+                                1.0,
+                                lerp(
+                                    0.0,
+                                    1.0,
+                                    f32::from(tower_state.number_of_disks - i)
+                                        / f32::from(tower_state.number_of_disks),
+                                ),
+                                lerp(
+                                    0.0,
+                                    1.0,
+                                    f32::from(tower_state.number_of_disks - i)
+                                        / f32::from(tower_state.number_of_disks),
+                                ),
+                            ),
+                            ..default()
+                        }),
+                        transform: Transform::from_translation(Vec3 {
+                            x: 0.0,
+                            y: f32::from(tower_state.number_of_disks - i - 1) * 0.6,
+                            z: 0.0,
+                        }),
+                        ..default()
+                    },
+                ));
+            }
+        });
+
+    let center = Vec3::new(
+        (f32::from(tower_state.number_of_towers - 1) * 3.0) * 0.5,
+        (f32::from(tower_state.number_of_disks - 1) * 0.6) * 0.5,
+        0.0,
+    );
+
+    // camera_query.iter_mut().next().unwrap().1.set(Box::new(
+    //     Transform::from_xyz(
+    //         center.x,
+    //         (f32::from(tower_state.number_of_disks - 1) * 0.6),
+    //         -(f32::from(tower_state.number_of_towers - 1) * 3.0)
+    //             - (f32::from(tower_state.number_of_disks) * 1.0),
+    //     )
+    //     .looking_at(center, Vec3::Y),
+    // ));
+
+    let (mut cam, mut transform) = camera_query.iter_mut().next().unwrap();
+    cam.focus = center;
+    cam.radius = (f32::from(tower_state.number_of_towers - 1) * 3.0)
+        + (f32::from(tower_state.number_of_disks) * 1.0);
+
+    let rot_matrix = Mat3::from_quat(transform.rotation);
+    transform.translation = cam.focus + rot_matrix.mul_vec3(Vec3::new(0.0, 0.0, cam.radius));
+
+    if tower_state.running {
+        tower_state.moves = helper(
+            tower_state.number_of_towers.try_into().unwrap(),
+            tower_state.number_of_disks.into(),
+        );
+    }
+}
 
 fn lerp(v0: f32, v1: f32, t: f32) -> f32 {
     let t = f32::min(f32::max(t, 0.0), f32::MAX);

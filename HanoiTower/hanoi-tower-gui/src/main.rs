@@ -4,6 +4,7 @@ use std::vec;
 
 use bevy::{
     app::{App, FixedUpdate, Startup, Update},
+    ecs::schedule::IntoSystemConfigs,
     time::{Timer, TimerMode},
     DefaultPlugins,
 };
@@ -43,7 +44,7 @@ fn main() {
     App::new()
         .insert_resource(TowerConfig {
             number_of_disks: 3,
-            number_of_tower: 3,
+            number_of_towers: 3,
             running: false,
             speed: 2.0,
             moves: vec![],
