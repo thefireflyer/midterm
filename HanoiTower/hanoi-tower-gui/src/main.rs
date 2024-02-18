@@ -1,16 +1,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 
+use std::vec;
+
 use bevy::{
     app::{App, Startup, Update},
     DefaultPlugins,
 };
 use hanoi_tower_solver::{debug, hanoi_general_rec, hanoi_simple_iter, hanoi_simple_rec};
 
-use crate::camera::pan_orbit_camera;
+use crate::{camera::pan_orbit_camera, resources::TowerConfig, systems::button_system};
 
 ///////////////////////////////////////////////////////////////////////////////
 
 mod camera;
+mod components;
+mod resources;
 mod systems;
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -31,31 +35,17 @@ fn main() {
     hanoi_simple_iter(&mut o, &mut a, &mut t);
 
     println!();
-
-    let i = 4;
-    let j = 4;
-    println!("{} pegs with {} disks", i, j);
-    let f: Vec<u32> = (0..j).rev().collect();
-    let mut rods = vec![];
-    for n in 0..i {
-        rods.push(vec![]);
-    }
-    rods[0] = f.clone();
-    hanoi_general_rec(
-        j.try_into().unwrap(),
-        0,
-        &mut rods,
-        0,
-        i - 1,
-        (1..i - 1).collect(),
-    );
-    println!();
-
-    println!();
     App::new()
+        .insert_resource(TowerConfig {
+            number_of_disks: 3,
+            number_of_tower: 3,
+            running: false,
+            speed: 1.0,
+            moves: vec![],
+        })
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, systems::setup)
-        .add_systems(Update, pan_orbit_camera)
+        .add_systems(Update, (pan_orbit_camera, button_system))
         .run();
 }
 

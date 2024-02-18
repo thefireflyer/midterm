@@ -129,6 +129,8 @@ Otherwise,
 
 */
 
+///////////////////////////////////////////////////////////////////////////////
+
 fn debug2(m: usize, d: u32, pegs: &Vec<Vec<u32>>, source: usize, target: usize) {
     print!("{} | ", d);
     for _ in 0..d {
@@ -155,7 +157,8 @@ fn debug2(m: usize, d: u32, pegs: &Vec<Vec<u32>>, source: usize, target: usize) 
     }
 }
 
-pub fn check2(pegs: &Vec<Vec<u32>>) {}
+///////////////////////////////////////////////////////////////////////////////
+
 pub fn hanoi_general_rec(
     m: usize,
     d: u32,
@@ -163,6 +166,7 @@ pub fn hanoi_general_rec(
     source: usize,
     target: usize,
     aux: Vec<usize>,
+    moves: &mut Vec<(usize, usize, u32)>,
 ) {
     assert!(pegs.len() >= 3);
     // assert!(d < 15);
@@ -175,18 +179,22 @@ pub fn hanoi_general_rec(
         let val = pegs[source].pop().unwrap();
         pegs[target].push(val);
         debug2(m, d, pegs, source, target);
+        moves.push((source, target, val));
     } else if m == 2 {
         let val = pegs[source].pop().unwrap();
         pegs[aux[0]].push(val);
         debug2(m, d, pegs, source, target);
+        moves.push((source, aux[0], val));
 
         let val = pegs[source].pop().unwrap();
         pegs[target].push(val);
         debug2(m, d, pegs, source, target);
+        moves.push((source, target, val));
 
         let val = pegs[aux[0]].pop().unwrap();
         pegs[target].push(val);
         debug2(m, d, pegs, source, target);
+        moves.push((aux[0], target, val));
     } else {
         let k = aux.len();
 
@@ -196,6 +204,7 @@ pub fn hanoi_general_rec(
                 let val = pegs[source].pop().unwrap();
                 pegs[aux[i]].push(val);
                 debug2(m, d, pegs, source, target);
+                moves.push((source, aux[i], val));
             }
             let val = pegs[source].pop().unwrap();
             pegs[target].push(val);
@@ -203,6 +212,7 @@ pub fn hanoi_general_rec(
                 let val = pegs[aux[i]].pop().unwrap();
                 pegs[target].push(val);
                 debug2(m, d, pegs, source, target);
+                moves.push((aux[i], target, val));
             }
         } else {
             let mut vals = vec![];
@@ -219,7 +229,7 @@ pub fn hanoi_general_rec(
                 }
             }
 
-            hanoi_general_rec(m - k, d + 1, pegs, source, aux[0], vec![target]);
+            hanoi_general_rec(m - k, d + 1, pegs, source, aux[0], vec![target], moves);
             debug2(m, d, pegs, source, target);
 
             for i in 1..k {
@@ -229,11 +239,13 @@ pub fn hanoi_general_rec(
                     let val = vals.pop().unwrap();
                     pegs[aux[i]].push(val);
                     debug2(m, d, pegs, source, target);
+                    moves.push((source, aux[i], val));
                 }
             }
 
             pegs[target].push(val);
             debug2(m, d, pegs, source, target);
+            moves.push((source, target, val));
 
             for i in (1..k).rev() {
                 if pegs[aux[i]].is_empty() {
@@ -242,10 +254,11 @@ pub fn hanoi_general_rec(
                     let val = pegs[aux[i]].pop().unwrap();
                     pegs[target].push(val);
                     debug2(m, d, pegs, source, target);
+                    moves.push((aux[i], target, val));
                 }
             }
 
-            hanoi_general_rec(m - k, d + 1, pegs, aux[0], target, vec![source]);
+            hanoi_general_rec(m - k, d + 1, pegs, aux[0], target, vec![source], moves);
         }
     }
 
@@ -313,6 +326,7 @@ mod tests {
                     0,
                     i - 1,
                     (1..i - 1).collect(),
+                    &mut vec![],
                 );
                 for n in 0..i - 1 {
                     assert_eq!(rods[n], vec![]);
