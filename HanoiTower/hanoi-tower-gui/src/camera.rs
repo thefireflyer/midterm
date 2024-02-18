@@ -1,19 +1,7 @@
 use bevy::{
-    core_pipeline::core_3d::Camera3dBundle,
-    ecs::{
-        component::Component,
-        event::EventReader,
-        query::With,
-        system::{Commands, Query, Res},
-    },
-    input::{
-        mouse::{MouseButton, MouseMotion, MouseWheel},
-        Input,
-    },
-    math::{Mat3, Quat, Vec2, Vec3},
-    render::camera::Projection,
-    transform::components::Transform,
-    window::{PrimaryWindow, Window},
+    input::mouse::{MouseMotion, MouseWheel},
+    prelude::*,
+    window::PrimaryWindow,
 };
 
 // [source] https://bevy-cheatbook.github.io/cookbook/pan-orbit-camera.html
@@ -42,7 +30,7 @@ pub fn pan_orbit_camera(
     windows: Query<&Window, With<PrimaryWindow>>,
     mut ev_motion: EventReader<MouseMotion>,
     mut ev_scroll: EventReader<MouseWheel>,
-    input_mouse: Res<Input<MouseButton>>,
+    input_mouse: Res<ButtonInput<MouseButton>>,
     mut query: Query<(&mut PanOrbitCamera, &mut Transform, &Projection)>,
 ) {
     // change input mapping for orbit and panning here
@@ -55,16 +43,16 @@ pub fn pan_orbit_camera(
     let mut orbit_button_changed = false;
 
     if input_mouse.pressed(orbit_button) {
-        for ev in ev_motion.iter() {
+        for ev in ev_motion.read() {
             rotation_move += ev.delta;
         }
     } else if input_mouse.pressed(pan_button) {
         // Pan only if we're not rotating at the moment
-        for ev in ev_motion.iter() {
+        for ev in ev_motion.read() {
             pan += ev.delta;
         }
     }
-    for ev in ev_scroll.iter() {
+    for ev in ev_scroll.read() {
         scroll += ev.y;
     }
     if input_mouse.just_released(orbit_button) || input_mouse.just_pressed(orbit_button) {
