@@ -4,7 +4,7 @@ use bevy::{
     app::{App, Startup, Update},
     DefaultPlugins,
 };
-use hanoi_tower_solver::{debug, hanoi_simple_iter, hanoi_simple_rec};
+use hanoi_tower_solver::{debug, hanoi_general_rec, hanoi_simple_iter, hanoi_simple_rec};
 
 use crate::camera::pan_orbit_camera;
 
@@ -30,6 +30,28 @@ fn main() {
     let mut t = vec![];
     hanoi_simple_iter(&mut o, &mut a, &mut t);
 
+    println!();
+
+    let i = 4;
+    let j = 4;
+    println!("{} pegs with {} disks", i, j);
+    let f: Vec<u32> = (0..j).rev().collect();
+    let mut rods = vec![];
+    for n in 0..i {
+        rods.push(vec![]);
+    }
+    rods[0] = f.clone();
+    hanoi_general_rec(
+        j.try_into().unwrap(),
+        0,
+        &mut rods,
+        0,
+        i - 1,
+        (1..i - 1).collect(),
+    );
+    println!();
+
+    println!();
     App::new()
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, systems::setup)
