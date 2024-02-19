@@ -9,8 +9,6 @@ use std::process::Stdio;
 
 mod cli;
 
-//cargo run -- -p '/usr/share/myspell/dicts/en_US-large.dic' check-suggest
-
 ///////////////////////////////////////////////////////////////////////////////
 
 fn main() -> Result<()> {
@@ -61,52 +59,51 @@ fn main() -> Result<()> {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-#[cfg(target_os = "linux")]
 fn find_default() -> Result<PathBuf> {
     println!("No dictionary provided, searching default paths...");
+    if cfg!(target_os = "linux") {
+        let output = Command::new("fd")
+            .arg("-e")
+            .arg("dic")
+            .current_dir("/")
+            .stdout(Stdio::piped())
+            .output()
+            .expect("Process failed to execute");
 
-    let output = Command::new("fd")
-        .arg("-e")
-        .arg("dic")
-        .current_dir("/")
-        .stdout(Stdio::piped())
-        .output()
-        .expect("Process failed to execute");
+        let out = String::from_utf8(output.stdout)?;
 
-    let out = String::from_utf8(output.stdout)?;
+        let paths: Vec<&str> = out.split('\n').collect();
 
-    let paths: Vec<&str> = out.split('\n').collect();
+        println!("Found {} possible sources", paths.len());
+        println!();
 
-    println!("Found {} possible sources", paths.len());
-    println!();
+        for path in paths {
+            if path.contains("en_US")
+                || path.contains("en_GB")
+                || path.contains("standard")
+                || path.contains("default")
+            {
+                let path = "/".to_owned() + path;
 
-    for path in paths {
-        if path.contains("en_US")
-            || path.contains("en_GB")
-            || path.contains("standard")
-            || path.contains("default")
-        {
-            let path = "/".to_owned() + path;
+                println!("Checking {}", path);
 
-            println!("Checking {}", path);
+                match fs::read_to_string(path.clone()) {
+                    Ok(contents) => {
+                        if contents.contains("probably") {
+                            println!("Using {}", path.clone());
 
-            match fs::read_to_string(path.clone()) {
-                Ok(contents) => {
-                    if contents.contains("probably") {
-                        println!("Using {}", path.clone());
+                            println!();
+                            println!("{:-^80}", "");
+                            println!();
 
-                        println!();
-                        println!("{:-^80}", "");
-                        println!();
-
-                        return Ok(PathBuf::from(path));
+                            return Ok(PathBuf::from(path));
+                        }
                     }
-                }
-                Err(err) => println!("Failed to open {} because {}", path, err),
-            };
+                    Err(err) => println!("Failed to open {} because {}", path, err),
+                };
+            }
         }
     }
-
     Err(Error::msg("Unable to find default"))
 }
 
