@@ -46,7 +46,7 @@ cd hanoi-tower-gui
 cargo run
 ```
 
-> ![video](example3643-4512.mp4)
+> <video src="example3643-4512.mp4">
 
 ## Approach
 
