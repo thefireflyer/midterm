@@ -115,22 +115,6 @@ pub fn hanoi_simple_iter(o: &mut Vec<u32>, a: &mut Vec<u32>, t: &mut Vec<u32>) {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-/*
---- Variables pegs and disks
-
-Pegs = {} of k length
-Disks = [] of n length
-
-If k >= n, then just lay out the disk across n pegs and then collect them for a total of 2n-1 actions
-
-Otherwise,
-
-
-
-*/
-
-///////////////////////////////////////////////////////////////////////////////
-
 fn debug2(m: usize, d: u32, pegs: &Vec<Vec<u32>>, source: usize, target: usize) {
     print!("{} | ", d);
     for _ in 0..d {
