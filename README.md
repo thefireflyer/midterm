@@ -9,41 +9,6 @@
 
 ---
 
-### Progress (delete me)
-
-- [ ] code library
-    - [x] copy over algorithms
-        - [x] linear search
-        - [x] binary search
-        - [x] selection sort
-        - [x] insertion sort
-        - [x] quick sort
-        - [x] merge sort
-    - [x] linked lists
-        - [x] copy over single linked list
-    - [x] copy over code library from week 5 and 6
-- [ ] spell checker
-    - [x] library
-        - [x] check
-        - [x] edit distance
-        - [x] suggest
-        - [x] load from file
-        - [x] add word
-        - [x] switch to separate chaining hashset
-    - [ ] cli
-        - [x] check
-        - [x] suggest
-        - [x] load from file
-        - [x] add word
-        - [ ] interactive mode?
-    - [ ] video
-- [ ] hanoi tower
-    - [x] solver
-    - [x] gui
-    - [ ] video
-
----
-
 ### [Hanoi's Tower](HanoiTower/README.md)
 
 ### [Spell checker](SpellChecker/README.md)
