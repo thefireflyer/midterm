@@ -46,7 +46,9 @@ cd hanoi-tower-gui
 cargo run
 ```
 
-> <video src="example3643-4512.mp4">
+https://github.com/thefireflyer/midterm/assets/64284477/7247472c-ae22-431d-a544-1f43caeac9f9
+
+
 
 ## Approach
 
