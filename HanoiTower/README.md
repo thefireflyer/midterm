@@ -7,7 +7,7 @@
 | Class | CS240 2963 |
 | Professor | Darrell Criss |
 
-![Hanoi tower video](https://youtu.be/XivUOqaykZM)
+[Hanoi tower video](https://youtu.be/XivUOqaykZM)
 
 ## Organization
 
