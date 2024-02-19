@@ -8,6 +8,25 @@ use cs_240_library::data_structures::hashset::HashSet;
 
 ///////////////////////////////////////////////////////////////////////////////
 
+/*
+
+Video notes
+
+- explain data structure
+    - hash set
+        - O(1) lookup
+        - O(1) add
+    - binary heap in suggest function
+- each function in here
+- each function in main.rs
+    - the match statements
+- demo cli
+- demo test
+
+*/
+
+///////////////////////////////////////////////////////////////////////////////
+
 /// Ternary operator
 ///
 /// Returns a if c is true, otherwise b
@@ -188,7 +207,7 @@ impl SpellChecker {
         // we'll just ignore conjugation here.
         for line in contents.lines() {
             let word = line.split("/").next().unwrap_or_default();
-            context.add_word(&word.to_lowercase());
+            context.add_word(&word);
         }
 
         Ok(context)

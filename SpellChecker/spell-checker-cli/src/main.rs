@@ -14,8 +14,10 @@ mod cli;
 fn main() -> Result<()> {
     let args = cli::Config::parse();
 
+    // get the dictionary file path from the arguments or find a default
     let source = args.path.unwrap_or_else(|| find_default().unwrap());
 
+    // create spell checker
     let mut spell_checker = SpellChecker::from_file(&source)?;
 
     match args.command {
@@ -51,7 +53,6 @@ fn main() -> Result<()> {
                 fs::write("/tmp/tmp.dic", spell_checker.to_string())?;
             }
         }
-        cli::Command::Interactive => todo!(),
     }
 
     Ok(())

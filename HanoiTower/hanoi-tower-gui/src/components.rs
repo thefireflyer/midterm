@@ -6,6 +6,7 @@ use bevy::ecs::component::Component;
 
 #[derive(Component)]
 pub struct Tower;
+
 //---------------------------------------------------------------------------//
 
 #[derive(Component)]

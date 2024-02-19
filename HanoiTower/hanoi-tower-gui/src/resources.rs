@@ -3,7 +3,7 @@
 use bevy::{ecs::system::Resource, time::Timer};
 
 ///////////////////////////////////////////////////////////////////////////////
-///
+
 #[derive(Resource)]
 pub struct TowerConfig {
     pub number_of_towers: u16,
