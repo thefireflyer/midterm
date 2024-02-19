@@ -65,8 +65,8 @@
 
 - [ ] hanoi tower
 
-    - [ ] solver
-    - [ ] gui
+    - [x] solver
+    - [x] gui
     - [ ] video
 
 ---

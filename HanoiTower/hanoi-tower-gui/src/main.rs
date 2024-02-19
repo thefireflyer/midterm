@@ -4,22 +4,23 @@ use std::vec;
 
 use bevy::{
     app::{App, FixedUpdate, Startup, Update},
-    ecs::schedule::IntoSystemConfigs,
     time::{Timer, TimerMode},
     DefaultPlugins,
 };
-use hanoi_tower_solver::{debug, hanoi_general_rec, hanoi_simple_iter, hanoi_simple_rec};
+use hanoi_tower_solver::{debug, hanoi_simple_iter, hanoi_simple_rec};
 
 use crate::{
     camera::pan_orbit_camera,
+    events::ConfigEvent,
     resources::TowerConfig,
-    systems::{button_system, update_disk},
+    systems::{animate_disks, handle_buttons, on_config_event},
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
 mod camera;
 mod components;
+mod events;
 mod resources;
 mod systems;
 
@@ -50,10 +51,11 @@ fn main() {
             moves: vec![],
             timer: Timer::from_seconds(2.0, TimerMode::Repeating),
         })
+        .add_event::<ConfigEvent>()
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, systems::setup)
-        .add_systems(Update, (pan_orbit_camera, button_system))
-        .add_systems(FixedUpdate, update_disk)
+        .add_systems(Update, (pan_orbit_camera, handle_buttons, on_config_event))
+        .add_systems(FixedUpdate, animate_disks)
         .run();
 }
 
