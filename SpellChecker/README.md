@@ -7,7 +7,7 @@
 | Class | CS240 2963 |
 | Professor | Darrell Criss |
 
-![Spell checker video]()
+[Spell checker video](https://youtu.be/wyySKhGMwgY)
 
 ## Organization
 
